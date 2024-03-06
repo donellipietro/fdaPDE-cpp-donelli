@@ -36,7 +36,8 @@ struct RegressionModel__ {
     template <typename M>
     using fn_ptrs = fdapde::mem_fn_ptrs<
       &M::f, &M::beta, &M::g, &M::fitted, &M::W, &M::XtWX, &M::U, &M::V, &M::invXtWX, &M::invA, &M::q, &M::n_obs,
-      &M::norm, &M::y, &M::T, &M::lmbQ, &M::has_covariates, &M::nan_mask, &M::set_mask, &M::X>;
+      &M::norm, &M::y, &M::T, &M::lmbQ, &M::has_covariates, &M::nan_mask, &M::set_mask, &M::X,
+      &M::set_lambda_D, &M::set_spatial_locations>;
     // interface implementation
     decltype(auto) f()       const { return invoke<const DVector<double>&   , 0>(*this); }
     decltype(auto) beta()    const { return invoke<const DVector<double>&   , 1>(*this); }
@@ -60,6 +61,8 @@ struct RegressionModel__ {
     decltype(auto) nan_mask() const { return invoke<const BinaryVector<Dynamic>&, 17>(*this); }
     decltype(auto) set_mask(const BinaryVector<Dynamic>& mask) { return invoke<void, 18>(*this, mask); }
     decltype(auto) X() const { return invoke<const DMatrix<double>&, 19>(*this); }
+    decltype(auto) set_lambda_D(double lambda_D) const { return invoke<void, 20>(*this, lambda_D); }
+    decltype(auto) set_spatial_locations(const DMatrix<double> & locs) const { return invoke<void, 21>(*this, locs); }
 };
 
 template <typename RegularizationType>

@@ -64,7 +64,7 @@ template <typename T> struct CalibratorBase {
 template <typename ModelType_> struct Calibrator__ {
     template <typename T> using fn_ptrs = fdapde::mem_fn_ptrs<&T::template fit<ModelType_>, &T::optimum>;
     decltype(auto) fit(ModelType_& model) { return fdapde::invoke<DVector<double>, 0>(*this, model); }
-    decltype(auto) optimum(ModelType_& model) { return fdapde::invoke<DVector<double>, 1>(*this, model); }
+    decltype(auto) optimum() { return fdapde::invoke<DVector<double>, 1>(*this); }
 };
 template <typename ModelType_> using Calibrator = fdapde::erase<fdapde::heap_storage, Calibrator__<ModelType_>>;
 
