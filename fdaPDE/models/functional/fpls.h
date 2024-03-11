@@ -96,7 +96,7 @@ class FPLS : public FunctionalBase<FPLS<RegularizationType_>, RegularizationType
             T_.col(h) = X_h * Psi() * W_.col(h);   // X latent component
 
             // regression: solves \argmin_{c} \norm_F{X_h - t*c^\top}^2 + P_{\lambda}(c)
-            C_.col(h) = smooth_mean(X_h, T_.col(h), smoother_, calibrator_);
+            C_.col(h) = smooth_mean(X_h, T_.col(h), smoother_, calibrator_).second;
             D_.col(h) = Y_h.transpose() * T_.col(h) / T_.col(h).squaredNorm();
 
             // deflation
