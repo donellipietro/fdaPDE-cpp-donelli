@@ -15,6 +15,8 @@
 // functional test suite
 #include "src/fpca_test.cpp"
 #include "src/fpls_r_test.cpp"
+#include "src/fpls_a_test.cpp"
+#include "src/fpls_sb_test.cpp"
 #include "src/centering_test.cpp"
 
 
