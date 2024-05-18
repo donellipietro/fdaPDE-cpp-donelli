@@ -91,7 +91,7 @@ TEST(fpls_r_test, laplacian_samplingatnodes_sequential_off) {
     EXPECT_TRUE(almost_equal(
       model.reconstructed().rowwise() + centered_covs.mean.col(0).transpose(),
       "../data/models/fpls/2D_test1/X_hat.csv"));
-    EXPECT_TRUE(almost_equal(model.B(), "../data/models/fpls/2D_test1/B_hat.csv"));
+    EXPECT_TRUE(almost_equal(model.Beta(), "../data/models/fpls/2D_test1/Beta_hat.csv"));
 }
 
 // test 2
@@ -142,5 +142,5 @@ TEST(fpls_r_test, laplacian_samplingatnodes_sequential_gcv) {
     EXPECT_TRUE(almost_equal(
       model.reconstructed().rowwise() + centered_covs.mean.col(0).transpose(),
       "../data/models/fpls/2D_test2/X_hat.csv"));
-    EXPECT_TRUE(almost_equal(model.B(), "../data/models/fpls/2D_test2/B_hat.csv"));
+    EXPECT_TRUE(almost_equal(model.Beta(), "../data/models/fpls/2D_test2/Beta_hat.csv"));
 }

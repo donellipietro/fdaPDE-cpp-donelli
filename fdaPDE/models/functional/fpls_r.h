@@ -88,7 +88,7 @@ class FPLS_R : public FPLS_BASE<RegularizationType_, FPLS_R<RegularizationType_>
         const DMatrix<double> & R_h = X_loadings_.leftCols(h);
         return T_h * R_h.transpose();
     }
-    const DMatrix<double> B(std::size_t h = 0) const { 
+    const DMatrix<double> Beta(std::size_t h = 0) const { 
         if(h == 0) h = n_comp();
         const DMatrix<double> & W_h = X_space_directions_.leftCols(h);
         const DMatrix<double> & R_h = X_loadings_.leftCols(h);
