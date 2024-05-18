@@ -28,10 +28,10 @@ using fdapde::core::Grid;
 
 #include "../../fdaPDE/models/regression/srpde.h"
 using fdapde::models::SRPDE;
-#include "../../fdaPDE/models/functional/fpls.h"
+#include "../../fdaPDE/models/functional/fpls_r.h"
 #include "../../fdaPDE/models/functional/center.h"
 #include "../../fdaPDE/models/sampling_design.h"
-using fdapde::models::FPLS;
+using fdapde::models::FPLS_R;
 using fdapde::models::RegularizedSVD;
 using fdapde::models::Sampling;
 using fdapde::models::center;
@@ -72,7 +72,7 @@ TEST(fpls_test, laplacian_samplingatnodes_sequential_off) {
     RegularizedSVD<fdapde::sequential> rsvd {Calibration::off};
     rsvd.set_tolerance(1e-2);
     rsvd.set_max_iter(20);
-    FPLS<SpaceOnly> model(pde, Sampling::mesh_nodes, rsvd);   // functional partial least squares model
+    FPLS_R<SpaceOnly> model(pde, Sampling::mesh_nodes, rsvd);   // functional partial least squares model
     model.set_lambda_D(lambda_D);
     model.set_regression_step_calibrator(fdapde::calibration::Off {}(SVector<1>(lambda_D)));
     // set model's data
@@ -122,7 +122,7 @@ TEST(fpls_test, laplacian_samplingatnodes_sequential_gcv) {
     rsvd.set_max_iter(20);
     rsvd.set_lambda(lambda_grid);
     rsvd.set_seed(seed);   // for reproducibility purposes in testing
-    FPLS<SpaceOnly> model(pde, Sampling::mesh_nodes, rsvd);   // functional partial least square models
+    FPLS_R<SpaceOnly> model(pde, Sampling::mesh_nodes, rsvd);   // functional partial least square models
     model.set_regression_step_calibrator(
       fdapde::calibration::GCV {Grid<fdapde::Dynamic> {}, StochasticEDF(1000, seed)}(lambda_grid));
     // set model's data
