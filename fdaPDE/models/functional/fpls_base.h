@@ -92,10 +92,6 @@ class FPLS_BASE : public FunctionalBase<FPLS_BASE<RegularizationType_, FPLS_MODE
             // directions estimation step:
             model().directions_estimation(X_h, Y_h, h, rsvd_);
 
-            // data projection
-            X_latent_scores_.col(h) = X_h * Psi() * X_space_directions_.col(h);
-            Y_latent_scores_.col(h) = Y_h * Y_space_directions_.col(h);
-
             // regression step:
             model().regression(X_h, Y_h, h, smoother_, calibrator_);
 

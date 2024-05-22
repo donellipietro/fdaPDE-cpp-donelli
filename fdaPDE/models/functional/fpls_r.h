@@ -58,8 +58,11 @@ class FPLS_R : public FPLS_BASE<RegularizationType_, FPLS_R<RegularizationType_>
         // correlation maximization
         // solves \argmin_{v,w} \norm_F{Y_h^\top*X_h - v^\top*w}^2 + (v^\top*v)*P_{\lambda}(w)
         rsvd_.compute(Y_h.transpose() * X_h, model_base(), 1);
-        X_space_directions_.col(h) = rsvd_.loadings();
-        Y_space_directions_.col(h) = rsvd_.scores() / rsvd_.loadings_norm()[0];
+        X_space_directions_.col(h) = rsvd_.loadings() / (Psi() * rsvd_.loadings()).norm();
+        Y_space_directions_.col(h) = rsvd_.scores() / rsvd_.scores().norm();
+        // data projection
+        X_latent_scores_.col(h) = X_h * Psi() * X_space_directions_.col(h);
+        Y_latent_scores_.col(h) = Y_h * Y_space_directions_.col(h);
         return;
     }
     void regression(DMatrix<double>& X_h, DMatrix<double> & Y_h, std::size_t h, SmootherType smoother_, Calibrator<SmootherType> calibrator_) {
