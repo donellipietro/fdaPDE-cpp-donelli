@@ -78,25 +78,28 @@ class FPLS_BASE : public FunctionalBase<FPLS_BASE<RegularizationType_, FPLS_MODE
     }
     void solve() {
         // allocate space
-        X_space_directions_.resize(n_basis(), n_comp_);        // optimal direction in X space
-        X_loadings_.resize(n_basis(), n_comp_);                // optimal X loadings
         Y_space_directions_.resize(Y().cols(), n_comp_);       // optimal direction in Y space
+        X_space_directions_.resize(n_basis(), n_comp_);        // optimal direction in X space
+        sigma_space_directions_.resize(n_comp_);
         Y_loadings_.resize(Y().cols(), n_comp_);               // optimal Y loadings
-        X_latent_scores_.resize(n_stat_units(), n_comp_);      // X latent scores
+        X_loadings_.resize(n_basis(), n_comp_);                // optimal X loadings
         Y_latent_scores_.resize(n_stat_units(), n_comp_);      // Y latent scores
+        X_latent_scores_.resize(n_stat_units(), n_comp_);      // X latent scores
+        
 
         // copy original data to avoid side effects
         DMatrix<double> X_h = X(), Y_h = Y();
+        DMatrix<double> M_h = Y_h.transpose() * X_h;
 
         for (std::size_t h = 0; h < n_comp_; ++h) {
             // directions estimation step:
-            model().directions_estimation(X_h, Y_h, h, rsvd_);
+            model().directions_estimation(M_h, X_h, Y_h, h, rsvd_);
 
             // regression step:
             model().regression(X_h, Y_h, h, smoother_, calibrator_);
 
             // deflation
-            model().deflation(X_h, Y_h, h);
+            model().deflation(M_h, X_h, Y_h, h);
         }
 
         return;
@@ -129,8 +132,9 @@ class FPLS_BASE : public FunctionalBase<FPLS_BASE<RegularizationType_, FPLS_MODE
     std::size_t n_comp_ = 3;                // number of latent components
 
     // problem solution
-    DMatrix<double> X_space_directions_;   // optimal directions in X space
-    DMatrix<double> Y_space_directions_;   // optimal directions in Y space
+    DMatrix<double> X_space_directions_;        // optimal directions in X space
+    DMatrix<double> Y_space_directions_;        // optimal directions in Y space
+    DVector<double> sigma_space_directions_;    // explained covariance
     DMatrix<double> X_latent_scores_;   // X latent scores
     DMatrix<double> Y_latent_scores_;   // Y latent scores
     DMatrix<double> X_loadings_;   // optimal X loadings

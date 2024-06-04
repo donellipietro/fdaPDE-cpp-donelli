@@ -54,10 +54,10 @@ class FPLS_R : public FPLS_BASE<RegularizationType_, FPLS_R<RegularizationType_>
            RegularizedSVD<sequential> rsvd = RegularizedSVD<fdapde::sequential>{}) :
         ModelBase(space_penalty, time_penalty, s, rsvd) {};
 
-    void directions_estimation(DMatrix<double>& X_h, DMatrix<double> & Y_h, std::size_t h, RSVDType<ModelBase> rsvd_) {
+    void directions_estimation(DMatrix<double>& M_h, DMatrix<double>& X_h, DMatrix<double> & Y_h, std::size_t h, RSVDType<ModelBase> rsvd_) {
         // correlation maximization
         // solves \argmin_{v,w} \norm_F{Y_h^\top*X_h - v^\top*w}^2 + (v^\top*v)*P_{\lambda}(w)
-        rsvd_.compute(Y_h.transpose() * X_h, model_base(), 1);
+        rsvd_.compute(M_h, model_base(), 1);
         X_space_directions_.col(h) = rsvd_.loadings() / (Psi() * rsvd_.loadings()).norm();
         Y_space_directions_.col(h) = rsvd_.scores() / rsvd_.scores().norm();
         // data projection
@@ -72,9 +72,10 @@ class FPLS_R : public FPLS_BASE<RegularizationType_, FPLS_R<RegularizationType_>
         Y_loadings_.col(h) = Y_h.transpose() * X_latent_scores_.col(h) / X_latent_scores_.col(h).squaredNorm();
         return;
     }
-    void deflation(DMatrix<double>& X_h, DMatrix<double> & Y_h, std::size_t h) {
+    void deflation(DMatrix<double>& M_h, DMatrix<double>& X_h, DMatrix<double> & Y_h, std::size_t h) {
         X_h -= X_latent_scores_.col(h) * (Psi() * X_loadings_.col(h)).transpose();
         Y_h -= X_latent_scores_.col(h) * Y_loadings_.col(h).transpose();
+        M_h = Y_h.transpose() * X_h;
         return;
     }
 

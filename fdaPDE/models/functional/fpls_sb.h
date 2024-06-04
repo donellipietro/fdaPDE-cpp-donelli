@@ -32,6 +32,7 @@ class FPLS_SB : public FPLS_BASE<RegularizationType_, FPLS_SB<RegularizationType
     using SmootherType = std::conditional_t<is_space_only<ModelBase>::value, SRPDE, STRPDE<RegularizationType, monolithic>>;
     using ModelBase::X_space_directions_;
     using ModelBase::Y_space_directions_;
+    using ModelBase::sigma_space_directions_;
     using ModelBase::X_loadings_;
     using ModelBase::X_loadings;
     using ModelBase::Y_loadings_;
@@ -54,12 +55,13 @@ class FPLS_SB : public FPLS_BASE<RegularizationType_, FPLS_SB<RegularizationType
            RegularizedSVD<sequential> rsvd = RegularizedSVD<fdapde::sequential>{}) :
         ModelBase(space_penalty, time_penalty, s, rsvd) {};
 
-    void directions_estimation(DMatrix<double>& X_h, DMatrix<double> & Y_h, std::size_t h, RSVDType<ModelBase> rsvd_) {
+    void directions_estimation(DMatrix<double>& M_h, DMatrix<double>& X_h, DMatrix<double> & Y_h, std::size_t h, RSVDType<ModelBase> rsvd_) {
         // correlation maximization
         // solves \argmin_{v,w} \norm_F{Y_h^\top*X_h - v^\top*w}^2 + (v^\top*v)*P_{\lambda}(w)
-        rsvd_.compute(Y_h.transpose() * X_h, model_base(), 1);
+        rsvd_.compute(M_h, model_base(), 1);
         X_space_directions_.col(h) = rsvd_.loadings() / (Psi() * rsvd_.loadings()).norm();
         Y_space_directions_.col(h) = rsvd_.scores() / rsvd_.scores().norm();
+        sigma_space_directions_[h] = rsvd_.scores().norm() * (Psi() * rsvd_.loadings()).norm();
         // data projection
         X_latent_scores_.col(h) = X_h * Psi() * X_space_directions_.col(h);
         Y_latent_scores_.col(h) = Y_h * Y_space_directions_.col(h);
@@ -71,9 +73,8 @@ class FPLS_SB : public FPLS_BASE<RegularizationType_, FPLS_SB<RegularizationType
         Y_loadings_.col(h) = Y_space_directions_.col(h);
         return;
     }
-    void deflation(DMatrix<double>& X_h, DMatrix<double> & Y_h, std::size_t h) {
-        X_h -= X_latent_scores_.col(h) * (Psi() * X_loadings_.col(h)).transpose();
-        Y_h -= Y_latent_scores_.col(h) * Y_loadings_.col(h).transpose();
+    void deflation(DMatrix<double>& M_h, DMatrix<double>& X_h, DMatrix<double> & Y_h, std::size_t h) {
+        M_h -= sigma_space_directions_[h] * Y_space_directions_.col(h) * X_space_directions_.col(h).transpose();
         return;
     }
 
