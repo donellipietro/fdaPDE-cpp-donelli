@@ -104,6 +104,7 @@ template <> class RegularizedSVD<sequential> {
                   calibration::KCV {rsvd_->n_folds_, rsvd_->seed_}.fit(model_, rsvd_->lambda_grid_, cv_score);
             } break;
             }
+            std::cout << "optimal lambda: " << optimal_lambda[0] << std::endl;
             solver_.compute(X_, optimal_lambda, f0);
             X_ -= solver_.s() * solver_.fn().transpose() * solver_.f_norm();   // X <- X - s*f_n^\top (deflation step)
             rsvd_->selected_lambdas_.push_back(optimal_lambda);                // store optimal smoothing level
